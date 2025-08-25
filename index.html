@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+	<link type="Image/x-icon" href="favicon.ico" rel="icon">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OD-Lens (Lite)</title>
+    <style>
+        :root {
+            --bg-color: #bfcfde;
+            --panel-bg: #eaf0ff;
+            --input-bg: white;
+            --readonly-bg: #e0ffe0;
+            --button-bg: lightgreen;
+            --text-color: #333;
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            padding: 10px;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: var(--panel-bg);
+            border-radius: 10px;
+            padding: 15px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        h1 {
+            text-align: center;
+            margin-bottom: 15px;
+            font-size: 1.5rem;
+        }
+        
+        .section {
+            margin-bottom: 15px;
+            padding: 10px;
+            border-radius: 5px;
+            background-color: rgba(255, 255, 255, 0.5);
+        }
+        
+        .input-row {
+            display: flex;
+            align-items: center;
+            margin-bottom: 8px;
+            flex-wrap: wrap;
+        }
+        
+        .radio-group {
+            display: flex;
+            align-items: center;
+            flex: 1;
+            min-width: 180px;
+        }
+        
+        .radio-group input[type="radio"] {
+            margin-right: 8px;
+        }
+        
+        .radio-group label {
+            font-weight: bold;
+        }
+        
+        .input-group {
+            display: flex;
+            align-items: center;
+            flex: 2;
+        }
+        
+        .input-group input {
+            flex: 1;
+            min-width: 80px;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            margin: 0 5px;
+        }
+        
+        .input-group .unit {
+            min-width: 40px;
+        }
+        
+        select {
+            padding: 8px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+            width: 100%;
+            margin-bottom: 10px;
+        }
+        
+        button {
+            background-color: var(--button-bg);
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            width: 100%;
+            margin: 10px 0;
+        }
+        
+        textarea {
+            width: 100%;
+            padding: 10px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+            font-family: monospace;
+            resize: vertical;
+            min-height: 100px;
+        }
+        
+        .result-row {
+            display: flex;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+        
+        .result-label {
+            flex: 1;
+            min-width: 140px;
+        }
+        
+        .result-value {
+            flex: 2;
+            padding: 5px;
+            background-color: rgba(255, 255, 255, 0.7);
+            border-radius: 4px;
+            min-height: 30px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .copyright {
+            text-align: center;
+            color: #777;
+            margin-top: 15px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+        
+        .copyright:hover {
+            color: #555;
+            text-decoration: underline;
+        }
+        
+        @media (max-width: 480px) {
+            .input-row {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .radio-group {
+                width: 100%;
+                margin-bottom: 5px;
+            }
+            
+            .input-group {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1><span style="color: darkblue;">OD-Lens</span><br><small>Optical Mini Calculator</small></h1>
+        
+        <div class="section">
+            <label for="projection">Projection function:</label>
+            <select id="projection">
+                <option value="rectilinear">Rectilinear (perspective)</option>
+                <option value="equidistant">Equidistant (equi-angular)</option>
+            </select>
+        </div>
+        
+        <div class="section">
+            <div class="input-row">
+                <div class="radio-group">
+                    <input type="radio" id="mode_f" name="mode" value="f" checked>
+                    <label for="mode_f">Focal length:</label>
+                </div>
+                <div class="input-group">
+                    <input type="text" id="f_entry" placeholder="Enter value">
+                    <span class="unit">mm</span>
+                </div>
+            </div>
+            
+            <div class="input-row">
+                <div class="radio-group">
+                    <input type="radio" id="mode_fov" name="mode" value="fov">
+                    <label for="mode_fov">Field of view:</label>
+                </div>
+                <div class="input-group">
+                    <input type="text" id="fov_entry" placeholder="Enter value">
+                    <span class="unit">°</span>
+                </div>
+            </div>
+            
+            <div class="input-row">
+                <div class="radio-group">
+                    <input type="radio" id="mode_image" name="mode" value="image">
+                    <label for="mode_image">Image size:</label>
+                </div>
+                <div class="input-group">
+                    <input type="text" id="image_entry" placeholder="Enter value">
+                    <span class="unit">mm</span>
+                </div>
+            </div>
+            
+            <div class="result-row">
+                <div class="result-label">Half field angle:</div>
+                <div class="result-value" id="fov_half_label">—</div>
+            </div>
+            
+            <div class="result-row">
+                <div class="result-label">Half image size:</div>
+                <div class="result-value" id="y_label">—</div>
+            </div>
+        </div>
+        
+        <div class="section">
+            <h3>Aperture parameter</h3>
+            
+            <div class="input-row">
+                <div class="radio-group">
+                    <input type="radio" id="aperture_D" name="aperture_mode" value="D" checked>
+                    <label for="aperture_D">Entrance pupil:</label>
+                </div>
+                <div class="input-group">
+                    <input type="text" id="D_entry" placeholder="Enter value">
+                    <span class="unit">mm</span>
+                </div>
+            </div>
+            
+            <div class="input-row">
+                <div class="radio-group">
+                    <input type="radio" id="aperture_N" name="aperture_mode" value="N">
+                    <label for="aperture_N">F-number (f/#):</label>
+                </div>
+                <div class="input-group">
+                    <input type="text" id="N_entry" placeholder="Enter value">
+                </div>
+            </div>
+            
+            <div class="result-row">
+                <div class="result-label">Relative aperture:</div>
+                <div class="result-value" id="A_label">—</div>
+            </div>
+            
+            <div class="result-row">
+                <div class="result-label">Pupil area:</div>
+                <div class="result-value" id="pupil_area_label">—</div>
+            </div>
+        </div>
+        
+        <button id="save_btn">Save calculations</button>
+        
+        <textarea id="text_output" readonly></textarea>
+        
+        <div class="copyright" id="copyright">© Otkupman D.G., 2020</div>
+    </div>
+
+    <script>
+        // DOM elements
+        const projectionSelect = document.getElementById('projection');
+        const modeRadios = document.querySelectorAll('input[name="mode"]');
+        const apertureRadios = document.querySelectorAll('input[name="aperture_mode"]');
+        const fEntry = document.getElementById('f_entry');
+        const fovEntry = document.getElementById('fov_entry');
+        const imageEntry = document.getElementById('image_entry');
+        const DEntry = document.getElementById('D_entry');
+        const NEntry = document.getElementById('N_entry');
+        const fovHalfLabel = document.getElementById('fov_half_label');
+        const yLabel = document.getElementById('y_label');
+        const ALabel = document.getElementById('A_label');
+        const pupilAreaLabel = document.getElementById('pupil_area_label');
+        const saveBtn = document.getElementById('save_btn');
+        const textOutput = document.getElementById('text_output');
+        const copyright = document.getElementById('copyright');
+
+        // Application state
+        let currentMode = 'f';
+        let currentApertureMode = 'D';
+
+        // Function to normalize numeric input (convert comma to dot)
+        function normalizeNumber(input) {
+            return input.replace(/,/g, '.');
+        }
+
+        // Function to check if a value is numeric
+        function isNumeric(value) {
+            return !isNaN(parseFloat(value)) && isFinite(value);
+        }
+
+        // Update input mode (focal length, field of view, or image size)
+        function updateMode() {
+            // Reset all input fields
+            [fEntry, fovEntry, imageEntry].forEach(input => {
+                input.style.backgroundColor = 'var(--input-bg)';
+                input.readOnly = false;
+                input.placeholder = "Enter value";
+            });
+            
+            // Set readonly mode for the selected parameter
+            if (currentMode === 'f') {
+                fEntry.style.backgroundColor = 'var(--readonly-bg)';
+                fEntry.readOnly = true;
+                fEntry.placeholder = "";
+                fEntry.value = "";
+            } else if (currentMode === 'fov') {
+                fovEntry.style.backgroundColor = 'var(--readonly-bg)';
+                fovEntry.readOnly = true;
+                fovEntry.placeholder = "";
+                fovEntry.value = "";
+            } else if (currentMode === 'image') {
+                imageEntry.style.backgroundColor = 'var(--readonly-bg)';
+                imageEntry.readOnly = true;
+                imageEntry.placeholder = "";
+                imageEntry.value = "";
+            }
+            
+            // Reset results
+            fovHalfLabel.textContent = '—';
+            yLabel.textContent = '—';
+            ALabel.textContent = '—';
+            pupilAreaLabel.textContent = '—';
+        }
+
+        // Update aperture mode (pupil diameter or F-number)
+        function updateApertureMode() {
+            // Reset all input fields
+            [DEntry, NEntry].forEach(input => {
+                input.style.backgroundColor = 'var(--input-bg)';
+                input.readOnly = false;
+                input.placeholder = "Enter value";
+            });
+            
+            // Set readonly mode for the selected parameter
+            if (currentApertureMode === 'D') {
+                DEntry.style.backgroundColor = 'var(--readonly-bg)';
+                DEntry.readOnly = true;
+                DEntry.placeholder = "";
+                DEntry.value = "";
+            } else if (currentApertureMode === 'N') {
+                NEntry.style.backgroundColor = 'var(--readonly-bg)';
+                NEntry.readOnly = true;
+                NEntry.placeholder = "";
+                NEntry.value = "";
+            }
+        }
+
+        // Main calculation function
+        function recalc() {
+            try {
+                const projection = projectionSelect.value;
+                
+                // Get and normalize values from input fields
+                const fVal = normalizeNumber(fEntry.value.trim());
+                const fovVal = normalizeNumber(fovEntry.value.trim());
+                const imageVal = normalizeNumber(imageEntry.value.trim());
+                const DVal = normalizeNumber(DEntry.value.trim());
+                const NVal = normalizeNumber(NEntry.value.trim());
+                
+                // Check and convert values to numbers
+                let f = fVal && currentMode !== 'f' && isNumeric(fVal) ? parseFloat(fVal) : null;
+                let fov = fovVal && currentMode !== 'fov' && isNumeric(fovVal) ? parseFloat(fovVal) : null;
+                let image = imageVal && currentMode !== 'image' && isNumeric(imageVal) ? parseFloat(imageVal) : null;
+                let D = DVal && currentApertureMode !== 'D' && isNumeric(DVal) ? parseFloat(DVal) : null;
+                let N = NVal && currentApertureMode !== 'N' && isNumeric(NVal) ? parseFloat(NVal) : null;
+                
+                let fovHalf = fov !== null ? degToRad(fov / 2) : null;
+                let fovHalfDeg = fov !== null ? fov / 2 : null;
+                let imageHalf = image !== null ? image / 2 : null;
+                
+                // Calculation based on selected mode
+                if (currentMode === 'f') {
+                    if (fovHalf !== null && imageHalf !== null) {
+                        if (projection === 'rectilinear') {
+                            f = imageHalf / Math.tan(fovHalf);
+                        } else { // equidistant
+                            f = imageHalf / fovHalf;
+                        }
+                        fEntry.value = formatNumber(f);
+                    }
+                } else if (currentMode === 'fov') {
+                    if (f !== null && imageHalf !== null && f !== 0) {
+                        if (projection === 'rectilinear') {
+                            fovHalf = Math.atan(imageHalf / f);
+                        } else { // equidistant
+                            fovHalf = imageHalf / f;
+                        }
+                        fovHalfDeg = radToDeg(fovHalf);
+                        fov = fovHalfDeg * 2;
+                        fovEntry.value = formatNumber(fov);
+                    }
+                } else if (currentMode === 'image') {
+                    if (f !== null && fovHalf !== null) {
+                        if (projection === 'rectilinear') {
+                            imageHalf = f * Math.tan(fovHalf);
+                        } else { // equidistant
+                            imageHalf = f * fovHalf;
+                        }
+                        image = imageHalf * 2;
+                        imageEntry.value = formatNumber(image);
+                    }
+                }
+                
+                // Aperture parameters calculation
+                if (f !== null) {
+                    if (currentApertureMode === 'D') {
+                        if (N !== null && N !== 0) {
+                            D = f / N;
+                            DEntry.value = formatNumber(D);
+                        }
+                    } else if (currentApertureMode === 'N') {
+                        if (D !== null && D !== 0) {
+                            N = f / D;
+                            NEntry.value = formatNumber(N);
+                        }
+                    }
+                }
+                
+                // Update results
+                if (f !== null && D !== null && D !== 0) {
+                    ALabel.textContent = `1:${formatNumber(N)} = ${(D/f).toFixed(5)}`;
+                    const pupilArea = Math.PI * Math.pow(D/2, 2);
+                    pupilAreaLabel.textContent = `${formatNumber(pupilArea)} mm²`;
+                } else {
+                    ALabel.textContent = '—';
+                    pupilAreaLabel.textContent = '—';
+                }
+                
+                fovHalfLabel.textContent = fovHalfDeg !== null ? 
+                    `${formatNumber(fovHalfDeg)}°` : '—';
+                yLabel.textContent = imageHalf !== null ? 
+                    `${formatNumber(imageHalf)} mm` : '—';
+                
+            } catch (error) {
+                console.error("Calculation error:", error);
+            }
+        }
+
+        // Format number (remove trailing zeros after decimal point)
+        function formatNumber(num) {
+            if (num === null || isNaN(num)) return '—';
+            
+            // Format the number, removing unnecessary trailing zeros
+            return parseFloat(num.toFixed(7)).toString();
+        }
+
+        // Save results to text field
+        function saveResults() {
+            const fVal = fEntry.value.trim();
+            const fovVal = fovEntry.value.trim();
+            const imageVal = imageEntry.value.trim();
+            const DVal = DEntry.value.trim();
+            const NVal = NEntry.value.trim();
+            
+            if (!fVal && !fovVal && !imageVal && !DVal && !NVal) {
+                return; // Don't save if all fields are empty
+            }
+            
+            let output = '';
+            if (fVal) output += `F = ${fVal} mm\n`;
+            if (fovVal) output += `FOV = ${fovVal}°\n`;
+            if (imageVal) output += `Image = ${imageVal} mm\n`;
+            if (DVal) output += `Pupil = ${DVal} mm\n`;
+            if (NVal) output += `f/${NVal}`;
+            
+            textOutput.value = output;
+        }
+
+        // Go to GitHub when clicking on copyright
+        function goToGitHub() {
+            window.open('https://github.com/Otkupman', '_blank');
+        }
+
+        // Helper functions
+        function degToRad(degrees) {
+            return degrees * (Math.PI / 180);
+        }
+
+        function radToDeg(radians) {
+            return radians * (180 / Math.PI);
+        }
+
+        // Initialize event handlers
+        function init() {
+            // Mode change handlers
+            modeRadios.forEach(radio => {
+                radio.addEventListener('change', () => {
+                    currentMode = radio.value;
+                    updateMode();
+                    recalc();
+                });
+            });
+            
+            // Aperture mode change handlers
+            apertureRadios.forEach(radio => {
+                radio.addEventListener('change', () => {
+                    currentApertureMode = radio.value;
+                    updateApertureMode();
+                    recalc();
+                });
+            });
+            
+            // Value change handlers
+            projectionSelect.addEventListener('change', recalc);
+            [fEntry, fovEntry, imageEntry, DEntry, NEntry].forEach(input => {
+                input.addEventListener('input', recalc);
+                
+                // Auto-replace comma with dot on input
+                input.addEventListener('blur', function() {
+                    if (this.value.includes(',')) {
+                        this.value = this.value.replace(',', '.');
+                    }
+                });
+            });
+            
+            // Save button
+            saveBtn.addEventListener('click', saveResults);
+            
+            // Go to GitHub when clicking on copyright
+            copyright.addEventListener('click', goToGitHub);
+            
+            // Initialize interface
+            updateMode();
+            updateApertureMode();
+        }
+
+        // Start application after DOM is loaded
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>
